@@ -36,7 +36,7 @@ class DefaultControllerTest {
         ResultActions result = mockMvc.perform(request);
 
         // Then
-        result.andExpect(status().isOk())
+        result.andExpect(status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers.content().string(testString));
     }
 }
