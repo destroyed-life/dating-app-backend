@@ -18,8 +18,10 @@ permissions:
 
 jobs:
   testing:
-    runs-on: ubuntu-latest
     if: github.repository == 'destroyed-life/dating-app-backend'
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
     steps:
     - uses: actions/checkout@v3
     - name: Setup Java JDK
@@ -36,7 +38,6 @@ jobs:
     - uses: sarisia/actions-status-discord@v1
       if: failure()
       with:
-        webhook: ${{ secrets.DISCORD_WEBHOOK }}
         title: "PR Testing"
         description: "테스트에 실패했습니다.."
         image: "https://media.giphy.com/media/LO2Wi5nhyhR3jaZmw1/giphy.gif"
