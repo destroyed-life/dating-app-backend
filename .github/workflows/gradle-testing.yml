@@ -1,0 +1,44 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: gradle-testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    if: github.repository == 'destroyed-life/dating-app-backend'
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Java JDK
+      uses: actions/setup-java@v2.1.0
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+    - name: Check JAVA Version
+      run: javac -version
+    - name: Add Permission
+      run: chmod +x gradlew
+    - name: Run Testing
+      run: ./gradlew test
+    - uses: sarisia/actions-status-discord@v1
+      if: failure()
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        title: "PR Testing"
+        description: "테스트에 실패했습니다.."
+        image: "https://media.giphy.com/media/LO2Wi5nhyhR3jaZmw1/giphy.gif"
+        color: 0x0000ff
+        username: "테스트가 깨졌어요"
