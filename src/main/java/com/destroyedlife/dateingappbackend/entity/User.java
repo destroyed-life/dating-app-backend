@@ -33,10 +33,10 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<UserProfileImage> userProfileImages = new HashSet<>();
+    private final Set<UserProfileImage> userProfileImages = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<UserIdealType> userIdealTypes = new HashSet<>();
+    private final Set<UserIdealType> userIdealTypes = new HashSet<>();
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)

@@ -24,5 +24,5 @@ public class IdealType {
     private String description;
 
     @OneToMany(mappedBy = "idealType", cascade = CascadeType.ALL)
-    private Set<UserIdealType> idealTypes = new HashSet<>();
+    private final Set<UserIdealType> userIdealTypes = new HashSet<>();
 }

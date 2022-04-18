@@ -20,7 +20,7 @@ public class ProfileImage {
     private Long id;
 
     @OneToMany(mappedBy = "profileImage", cascade = CascadeType.ALL)
-    private Set<UserProfileImage> userProfileImages = new HashSet<>();
+    private final Set<UserProfileImage> userProfileImages = new HashSet<>();
 
     @Column(nullable = false)
     private String image;
