@@ -39,14 +39,14 @@ create table users (
 );
 create table users_ideal_type (
     id bigint unsigned not null auto_increment,
-    ideal_type_id bigint,
-    user_id bigint,
+    ideal_type_id bigint unsigned,
+    user_id bigint unsigned,
     primary key (id)
 );
 create table users_profile_image (
     id bigint unsigned not null auto_increment,
-    profile_image_id bigint,
-    user_id bigint,
+    profile_image_id bigint unsigned,
+    user_id bigint unsigned,
     primary key (id)
 );
 alter table users
