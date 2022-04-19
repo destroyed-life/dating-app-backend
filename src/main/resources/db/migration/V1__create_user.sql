@@ -1,17 +1,17 @@
 create table ideal_type (
-    id bigint not null auto_increment,
+    id bigint unsigned not null auto_increment,
     description varchar(255),
     type varchar(255) not null,
     primary key (id)
 );
 create table profile_image (
-   id bigint not null auto_increment,
+   id bigint unsigned not null auto_increment,
    created_at datetime(6) not null,
    image varchar(255) not null,
    primary key (id)
 );
 create table users (
-    id bigint not null auto_increment,
+    id bigint unsigned not null auto_increment,
     alcohol_mention varchar(255),
     base_address varchar(255),
     birth_day date,
@@ -38,13 +38,13 @@ create table users (
     primary key (id)
 );
 create table users_ideal_type (
-    id bigint not null auto_increment,
+    id bigint unsigned not null auto_increment,
     ideal_type_id bigint,
     user_id bigint,
     primary key (id)
 );
 create table users_profile_image (
-    id bigint not null auto_increment,
+    id bigint unsigned not null auto_increment,
     profile_image_id bigint,
     user_id bigint,
     primary key (id)

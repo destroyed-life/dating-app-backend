@@ -1,5 +1,5 @@
 package com.destroyedlife.dateingappbackend.enums;
 
-public enum Blood {
+public enum BloodType {
     A, B, O, AB
 }

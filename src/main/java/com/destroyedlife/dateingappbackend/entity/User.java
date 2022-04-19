@@ -29,7 +29,7 @@ public class User {
     @Column(length = 50, nullable = false)
     private String nickname;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 60, nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -39,17 +39,17 @@ public class User {
     private final Set<UserIdealType> userIdealTypes = new HashSet<>();
 
     @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
-    private HumanBody humanBody;
+    private HumanBodyType humanBody;
 
     @Enumerated(EnumType.STRING)
-    private Blood blood;
+    private BloodType blood;
 
     @Enumerated(EnumType.STRING)
     private MBTI mbti;
