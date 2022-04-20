@@ -1,4 +1,4 @@
-package com.destroyedlife.dateingappbackend.controller;
+package com.destroyedlife.dateingappbackend.http.controller;
 
 import com.destroyedlife.dateingappbackend.service.TestService;
 import org.springframework.web.bind.annotation.GetMapping;
