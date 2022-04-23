@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -41,12 +43,12 @@ class UserServiceTest {
         public void testExceptionWhenInvalidEmail()
         {
             // Given
-            given(userRepository.findByEmail(email)).willReturn(null);
+            given(userRepository.findByEmail(email)).willReturn(Optional.empty());
 
             // When && Then
-            ApiException ex = assertThrowsExactly(ApiException.class, () -> {
-                userService.authentication(email, password);
-            });
+            ApiException ex = assertThrowsExactly(ApiException.class, () ->
+                userService.authentication(email, password)
+            );
 
             assertEquals(ErrorCode.INVALID_EMAIL_OR_PASSWORD.getHttpStatus(), ex.getHttpStatus());
             assertEquals(ErrorCode.INVALID_EMAIL_OR_PASSWORD.getMessage(), ex.getMessage());
@@ -62,17 +64,17 @@ class UserServiceTest {
                 .createdAt(LocalDateTime.now())
                 .name("권강혁")
                 .email(email)
-                .password(new BCryptPasswordEncoder().encode(password))
+                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
                 .nickname("베러")
                 .role(Role.MEMBER)
                 .build();
 
-            given(userRepository.findByEmail(email)).willReturn(user);
+            given(userRepository.findByEmail(email)).willReturn(Optional.ofNullable(user));
 
             // When && Then
-            ApiException ex = assertThrowsExactly(ApiException.class, () -> {
-                userService.authentication(email, "kekekekekeke");
-            });
+            ApiException ex = assertThrowsExactly(ApiException.class, () ->
+                userService.authentication(email, "kekekekekeke")
+            );
 
             assertEquals(ErrorCode.INVALID_EMAIL_OR_PASSWORD.getHttpStatus(), ex.getHttpStatus());
             assertEquals(ErrorCode.INVALID_EMAIL_OR_PASSWORD.getMessage(), ex.getMessage());
@@ -88,14 +90,14 @@ class UserServiceTest {
                 .createdAt(LocalDateTime.now())
                 .name("권강혁")
                 .email(email)
-                .password(new BCryptPasswordEncoder().encode(password))
+                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
                 .nickname("베러")
                 .role(Role.MEMBER)
                 .build();
 
             String mockToken = "hi_this_is_test_token";
 
-            given(userRepository.findByEmail(email)).willReturn(user);
+            given(userRepository.findByEmail(email)).willReturn(Optional.ofNullable(user));
             given(jwtTokenService.createToken(user)).willReturn(mockToken);
 
             // When
