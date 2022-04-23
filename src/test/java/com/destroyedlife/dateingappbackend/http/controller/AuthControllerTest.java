@@ -1,6 +1,7 @@
 package com.destroyedlife.dateingappbackend.http.controller;
 
 import com.destroyedlife.dateingappbackend.http.request.UserLoginRequest;
+import com.destroyedlife.dateingappbackend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,15 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.BDDMockito.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -29,10 +30,12 @@ public class AuthControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private UserService userService;
+
     @Nested
     @DisplayName("Login method test")
     public class TestOfLoginMethod {
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get("/");
 
         @Test
         @DisplayName("이메일이 비어있는 경우 검증")
@@ -42,16 +45,13 @@ public class AuthControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // When
-            ResultActions result = mockMvc
-                .perform(
-                    post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                );
+            ResultActions result = sendApi(json);
 
             // Then
             result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("이메일을 입력해주세요"));
+
+            then(userService).shouldHaveNoInteractions();
         }
 
         @Test
@@ -62,16 +62,13 @@ public class AuthControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // When
-            ResultActions result = mockMvc
-                .perform(
-                    post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                );
+            ResultActions result = sendApi(json);
 
             // Then
             result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 이메일 형식이 아닙니다"));
+
+            then(userService).shouldHaveNoInteractions();
         }
 
         @Test
@@ -82,16 +79,13 @@ public class AuthControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // When
-            ResultActions result = mockMvc
-                .perform(
-                    post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                );
+            ResultActions result = sendApi(json);
 
             // Then
             result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("비밀번호를 입력해주세요"));
+
+            then(userService).shouldHaveNoInteractions();
         }
 
         @Test
@@ -100,18 +94,24 @@ public class AuthControllerTest {
             // Given
             UserLoginRequest request = new UserLoginRequest("abc@me.com", "password");
             String json = objectMapper.writeValueAsString(request);
+            String mockToken = "THIS_IS_TEST_TOKEN_WOW";
+
+            given(userService.authentication(request.getEmail(), request.getPassword())).willReturn(mockToken);
 
             // When
-            ResultActions result = mockMvc
-                .perform(
-                    post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(json)
-                );
+            ResultActions result = sendApi(json);
 
             // Then
             result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("abc@me.com"));
+                .andExpect(jsonPath("$.token").value(mockToken));
         }
+    }
+
+    private ResultActions sendApi(String json) throws Exception {
+        return mockMvc.perform(
+            post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json)
+        );
     }
 }
