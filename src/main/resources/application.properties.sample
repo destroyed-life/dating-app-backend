@@ -24,3 +24,6 @@ spring.flyway.baseline-description=true
 spring.flyway.baseline-version=0
 spring.flyway.sql-migration-prefix=V
 spring.flyway.sql-migration-suffixes=.sql
+
+auth.key="this_is_sample_auth_key"
+auth.token.time-to-live="1D"
