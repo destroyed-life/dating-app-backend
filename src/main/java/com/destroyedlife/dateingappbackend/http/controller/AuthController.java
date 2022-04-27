@@ -2,7 +2,6 @@ package com.destroyedlife.dateingappbackend.http.controller;
 
 import com.destroyedlife.dateingappbackend.http.request.UserLoginRequest;
 import com.destroyedlife.dateingappbackend.http.response.UserLoginResponse;
-import com.destroyedlife.dateingappbackend.service.JwtTokenService;
 import com.destroyedlife.dateingappbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +20,7 @@ public class AuthController {
     @PostMapping(value = "login")
     public UserLoginResponse login(@RequestBody @Validated UserLoginRequest request)
     {
-        String token = userService.authentication(request.getEmail(), request.getPassword());
+        String token = userService.issueJwtToken(request.getEmail(), request.getPassword());
         return new UserLoginResponse(token);
     }
 }
