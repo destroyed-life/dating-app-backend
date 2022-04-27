@@ -5,7 +5,6 @@ import com.destroyedlife.dateingappbackend.http.exception.ApiException;
 import com.destroyedlife.dateingappbackend.http.exception.ErrorCode;
 import com.destroyedlife.dateingappbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService tokenService;
 
-    public String authentication(String email, String password) {
+    public String issueJwtToken(String email, String password) {
         User user = repository.findByEmail(email)
             .orElseThrow(() -> new ApiException(ErrorCode.INVALID_EMAIL_OR_PASSWORD));
 
@@ -26,5 +25,13 @@ public class UserService {
         }
 
         return tokenService.createToken(user);
+    }
+
+    public User getUserFromJwtToken(String token)
+    {
+        String email = tokenService.getEmailFromToken(token);
+
+        return repository.findByEmail(email)
+            .orElseThrow(() -> new ApiException(ErrorCode.INVALID_TOKEN));
     }
 }

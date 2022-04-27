@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.token.TokenService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 import java.time.LocalDateTime;
@@ -35,8 +35,8 @@ class UserServiceTest {
     private final String password = "password";
 
     @Nested
-    @DisplayName("Authentication Method 테스트")
-    public class TestOfAuthentication {
+    @DisplayName("IssueJwtToken Method 테스트")
+    public class TestOfIssueJwtToken {
 
         @Test
         @DisplayName("존재하지 않는 메일인 경우")
@@ -47,7 +47,7 @@ class UserServiceTest {
 
             // When && Then
             ApiException ex = assertThrowsExactly(ApiException.class, () ->
-                userService.authentication(email, password)
+                userService.issueJwtToken(email, password)
             );
 
             assertEquals(ErrorCode.INVALID_EMAIL_OR_PASSWORD.getHttpStatus(), ex.getHttpStatus());
@@ -73,7 +73,7 @@ class UserServiceTest {
 
             // When && Then
             ApiException ex = assertThrowsExactly(ApiException.class, () ->
-                userService.authentication(email, "kekekekekeke")
+                userService.issueJwtToken(email, "kekekekekeke")
             );
 
             assertEquals(ErrorCode.INVALID_EMAIL_OR_PASSWORD.getHttpStatus(), ex.getHttpStatus());
@@ -101,10 +101,62 @@ class UserServiceTest {
             given(jwtTokenService.createToken(user)).willReturn(mockToken);
 
             // When
-            String token = userService.authentication(email, password);
+            String token = userService.issueJwtToken(email, password);
 
             // Then
             assertEquals(mockToken, token);
+        }
+    }
+
+    @Nested
+    @DisplayName("IssueJwtToken Method 테스트")
+    public class TestOfGetUserFromJwtToken {
+
+        @Test
+        @DisplayName("토큰을 전달하는 경우 토큰의 Subject로 유저를 검색한다")
+        public void testOfSuccess() {
+            // Given
+            String email = "test@test.com";
+            User user = User.builder()
+                .id(100L)
+                .createdAt(LocalDateTime.now())
+                .name("권강혁")
+                .email(email)
+                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
+                .nickname("베러")
+                .role(Role.MEMBER)
+                .build();
+
+            String token = "this_is_token";
+
+            given(jwtTokenService.getEmailFromToken(token)).willReturn(email);
+            given(userRepository.findByEmail(email)).willReturn(Optional.ofNullable(user));
+
+            // When
+            User result = userService.getUserFromJwtToken(token);
+
+            // Then
+            assertEquals(user, result);
+        }
+
+
+        @Test
+        @DisplayName("존재하지 않는 유저의 토큰은 예외를 발생시킨다")
+        public void testWhenException() {
+            // Given
+            String email = "test@test.com";
+            String token = "this_is_token";
+
+            given(jwtTokenService.getEmailFromToken(token)).willReturn(email);
+            given(userRepository.findByEmail(email)).willReturn(Optional.empty());
+
+            // When && Then
+            ApiException ex = assertThrowsExactly(ApiException.class, () ->
+                userService.getUserFromJwtToken(token)
+            );
+
+            assertEquals(ErrorCode.INVALID_TOKEN.getHttpStatus(), ex.getHttpStatus());
+            assertEquals(ErrorCode.INVALID_TOKEN.getMessage(), ex.getMessage());
         }
     }
 }

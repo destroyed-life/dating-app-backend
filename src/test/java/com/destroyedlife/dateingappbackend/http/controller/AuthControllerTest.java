@@ -96,7 +96,7 @@ public class AuthControllerTest {
             String json = objectMapper.writeValueAsString(request);
             String mockToken = "THIS_IS_TEST_TOKEN_WOW";
 
-            given(userService.authentication(request.getEmail(), request.getPassword())).willReturn(mockToken);
+            given(userService.issueJwtToken(request.getEmail(), request.getPassword())).willReturn(mockToken);
 
             // When
             ResultActions result = sendApi(json);
