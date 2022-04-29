@@ -1,7 +1,10 @@
 package com.destroyedlife.dateingappbackend.service;
 
 import com.destroyedlife.dateingappbackend.entity.User;
+import com.destroyedlife.dateingappbackend.http.exception.ApiException;
+import com.destroyedlife.dateingappbackend.http.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +22,8 @@ public class JwtTokenService {
     @Value("${auth.key}")
     private String secretKey;
 
-    @Value("${auth.token.time-to-live}")
-    private String ttl;
+    @Value("${auth.token.time-to-live-days}")
+    private Integer ttl;
 
     @PostConstruct
     private void init() {
@@ -32,13 +35,20 @@ public class JwtTokenService {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
         LocalDateTime now = LocalDateTime.now();
 
-        Period period = Period.parse(ttl);
-
         return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(Timestamp.valueOf(now))
-            .setExpiration(Timestamp.valueOf(now.plus(period)))
+            .setExpiration(Timestamp.valueOf(now.plusDays(ttl)))
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact();
+    }
+
+    public String getEmailFromToken(String token)
+    {
+        try {
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        } catch (Exception ex) {
+            throw new ApiException(ErrorCode.INVALID_TOKEN);
+        }
     }
 }

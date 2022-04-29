@@ -26,4 +26,4 @@ spring.flyway.sql-migration-prefix=V
 spring.flyway.sql-migration-suffixes=.sql
 
 auth.key="this_is_sample_auth_key"
-auth.token.time-to-live="1D"
+auth.token.time-to-live-days=60
