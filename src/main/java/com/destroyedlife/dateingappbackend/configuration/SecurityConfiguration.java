@@ -30,7 +30,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .and()
             .authorizeRequests()
-            .mvcMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+            .mvcMatchers(HttpMethod.POST, "/api/auth/login", "/user/signUp").permitAll()
+            .mvcMatchers(HttpMethod.GET, "/docs/index.html").permitAll()
             .anyRequest().authenticated()
             .and()
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

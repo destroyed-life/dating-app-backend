@@ -14,16 +14,17 @@ import java.util.Set;
 
 @Builder
 @Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "Users")
-public class User implements UserDetails {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, length = 50)
+    @Column(unique = true, nullable = false, length = 50)
     private String email;
 
     @Column(length = 30, nullable = false)
@@ -32,7 +33,7 @@ public class User implements UserDetails {
     @Column(length = 50, nullable = false)
     private String nickname;
 
-    @Column(length = 60, nullable = false)
+    @Column(nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -49,10 +50,10 @@ public class User implements UserDetails {
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
-    private HumanBodyType humanBody;
+    private HumanBodyType humanBodyType;
 
     @Enumerated(EnumType.STRING)
-    private BloodType blood;
+    private BloodType bloodType;
 
     @Enumerated(EnumType.STRING)
     private MBTI mbti;
@@ -89,35 +90,4 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
 
     private LocalDateTime deletedAt;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO : Role Check?
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.deletedAt == null;
-    }
 }
