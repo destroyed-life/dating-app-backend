@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.token.TokenService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class UserServiceTest {
     @MockBean
     private JwtTokenService jwtTokenService;
